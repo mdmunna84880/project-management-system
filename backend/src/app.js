@@ -4,8 +4,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middleware/errorHandler.js';
-import { ApiResponse } from './utils/apiresponse.js';
+import { ApiResponse } from './utils/ApiResponse.js';
 import { ApiError } from './utils/AppError.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -26,6 +27,9 @@ app.get('/api/health', (req, res) => {
         new ApiResponse(200, { timestamp: new Date().toISOString() }, 'System is running normally')
     );
 });
+
+// Auth Routes
+app.use('/api/auth', authRoutes);
 
 // 404 Handler for undefined routes
 app.use((req, res, next) => {
