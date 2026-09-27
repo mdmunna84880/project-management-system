@@ -74,3 +74,9 @@ export const logout = async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, null, 'Logged out successfully'));
 };
+
+export const getMe = async (req, res) => {
+    res.status(200).json(
+        new ApiResponse(200, { user: req.user }, 'Current user fetched successfully')
+    );
+};
