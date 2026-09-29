@@ -37,6 +37,20 @@ export const authApi = api.injectEndpoints({
     getMe: builder.query({
       query: () => '/auth/me',
     }),
+    updateProfile: builder.mutation({
+      query: (data) => ({
+        url: '/auth/me/update',
+        method: 'PATCH',
+        body: data,
+      }),
+    }),
+    updatePassword: builder.mutation({
+      query: (data) => ({
+        url: '/auth/me/password',
+        method: 'PATCH',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -45,4 +59,6 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useGetMeQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
 } = authApi;
