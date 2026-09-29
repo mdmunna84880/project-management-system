@@ -1,4 +1,5 @@
 import { api } from '../../lib/api';
+import { clearCredentials } from './authSlice';
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,7 +25,9 @@ export const authApi = api.injectEndpoints({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          // Clear the entire RTK Query cache on logout for security
+          // CRITICAL: clear auth slice first so ProtectedRoute redirects to /login
+          dispatch(clearCredentials());
+          // Then clear entire RTK Query cache for security
           dispatch(api.util.resetApiState());
         } catch (error) {
           console.error('Logout failed', error);

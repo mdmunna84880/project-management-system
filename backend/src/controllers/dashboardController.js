@@ -7,11 +7,14 @@ export const getDashboardStats = async (req, res) => {
   let projectIds = [];
   
   if (req.user.role === 'ADMIN') {
-    const projects = await Project.find().select('_id');
+    const projects = await Project.find({ status: { $ne: 'ARCHIVED' } }).select('_id');
     projectIds = projects.map(p => p._id);
   } else {
     const memberships = await ProjectMember.find({ user: req.user._id }).select('project');
-    projectIds = memberships.map(m => m.project);
+    // Get only non-archived projects this user is a member of
+    const allProjectIds = memberships.map(m => m.project);
+    const activeProjects = await Project.find({ _id: { $in: allProjectIds }, status: { $ne: 'ARCHIVED' } }).select('_id');
+    projectIds = activeProjects.map(p => p._id);
   }
 
   // fast path for users with no assigned projects

@@ -1,7 +1,7 @@
 import Task from '../models/Task.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import Project from '../models/Project.js';
-import { getFilteredTasks } from '../services/taskService.js';
+import { getFilteredTasks, getAllTasksService, getMyTasksService } from '../services/taskService.js';
 import notificationService from '../services/notificationService.js';
 
 const notifyUsers = async (task, projectOrId, currentUser, type, message) => {
@@ -124,4 +124,18 @@ export {
     updateTask,
     updateTaskStatus,
     deleteTask,
+    getAllTasks,
+    getMyTasks,
 };
+
+// Admin: GET /api/tasks — all tasks across all projects
+async function getAllTasks(req, res) {
+    const result = await getAllTasksService(req.query);
+    res.status(200).json(new ApiResponse(200, { tasks: result.tasks, pagination: result.pagination }, 'All tasks fetched'));
+}
+
+// User: GET /api/tasks/my — tasks assigned to the logged-in user across their projects
+async function getMyTasks(req, res) {
+    const result = await getMyTasksService(req.user._id, req.query);
+    res.status(200).json(new ApiResponse(200, { tasks: result.tasks, pagination: result.pagination }, 'My tasks fetched'));
+}

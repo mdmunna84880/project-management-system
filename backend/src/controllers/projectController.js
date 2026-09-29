@@ -27,17 +27,18 @@ export const createProject = async (req, res) => {
 };
 
 export const getProjects = async (req, res) => {
+    const includeArchived = req.query.includeArchived === 'true';
+    const statusFilter = includeArchived ? {} : { status: { $ne: 'ARCHIVED' } };
+
     let projects;
 
     if (req.user.role === 'ADMIN') {
-        // Admins see everything
-        projects = await Project.find().sort({ createdAt: -1 });
+        projects = await Project.find(statusFilter).sort({ createdAt: -1 });
     } else {
-        // Normal users only see projects where they are a member
-        const memberships = await ProjectMember.find({ user: req.user._id })
+        const memberships = await ProjectMember.find({ user: req.user._id });
         const projectIds = memberships.map((m) => m.project);
 
-        projects = await Project.find({ _id: { $in: projectIds } }).sort({ createdAt: -1 });
+        projects = await Project.find({ _id: { $in: projectIds }, ...statusFilter }).sort({ createdAt: -1 });
     }
 
     res.status(200).json(new ApiResponse(200, { projects }, 'Projects fetched successfully'));

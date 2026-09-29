@@ -12,6 +12,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 // Notification Routes
 app.use('/api/notifications', notificationRoutes);
+// User Routes (admin only)
+app.use('/api/users', userRoutes);
 
 // 404 Handler for undefined routes
 app.use((req, res, next) => {

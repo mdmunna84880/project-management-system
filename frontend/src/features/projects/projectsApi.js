@@ -3,7 +3,10 @@ import { api } from '@/lib/api';
 export const projectsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getProjects: builder.query({
-      query: () => '/projects',
+      query: ({ includeArchived = false } = {}) => ({
+        url: '/projects',
+        params: includeArchived ? { includeArchived: 'true' } : {},
+      }),
       // Extract array from ApiResponse envelope
       providesTags: (result) => 
         result?.data?.projects 
