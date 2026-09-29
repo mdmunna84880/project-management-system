@@ -5,8 +5,8 @@ const createProjectSchema = z.object({
     description: z.string().optional(),
     status: z.enum(['PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED']).optional(),
     priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
-    startDate: z.string().datetime().optional(), // Expecting ISO strings
-    dueDate: z.string().datetime({ message: 'Valid due date is required' }),
+    startDate: z.coerce.date().optional(),
+    dueDate: z.coerce.date({ message: 'Valid due date is required' }),
 });
 
 const updateProjectSchema = createProjectSchema.partial();

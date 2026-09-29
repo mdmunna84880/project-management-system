@@ -23,7 +23,7 @@ export const projectsApi = api.injectEndpoints({
         method: 'POST',
         body: newProject,
       }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }, 'Dashboard'],
     }),
     updateProject: builder.mutation({
       query: ({ id, ...patch }) => ({
@@ -33,7 +33,8 @@ export const projectsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: 'Project', id },
-        { type: 'Project', id: 'LIST' }
+        { type: 'Project', id: 'LIST' },
+        'Dashboard'
       ],
     }),
     archiveProject: builder.mutation({
@@ -43,7 +44,8 @@ export const projectsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [
         { type: 'Project', id },
-        { type: 'Project', id: 'LIST' }
+        { type: 'Project', id: 'LIST' },
+        'Dashboard'
       ],
     }),
     deleteProject: builder.mutation({
@@ -51,7 +53,7 @@ export const projectsApi = api.injectEndpoints({
         url: `/projects/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }, 'Dashboard'],
     }),
   }),
 });

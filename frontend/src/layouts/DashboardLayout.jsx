@@ -17,7 +17,7 @@ export default function DashboardLayout() {
           
           <nav className="space-y-1">
             <NavItem icon={<FiHome />} label="Dashboard" to="/" />
-            <NavItem icon={<FiCheckSquare />} label="Tasks" to="/tasks" />
+            <NavItem icon={<FiCheckSquare />} label="Projects" to="/projects" />
             <NavItem icon={<FiBell />} label="Notifications" to="/notifications" badge="3" />
           </nav>
         </div>

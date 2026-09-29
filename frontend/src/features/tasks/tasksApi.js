@@ -27,6 +27,7 @@ export const tasksApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { projectId }) => [
         { type: 'Task', id: `LIST-${projectId}` },
+        'Dashboard'
       ],
     }),
     updateTask: builder.mutation({
@@ -37,7 +38,8 @@ export const tasksApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id, projectId }) => [
         { type: 'Task', id },
-        { type: 'Task', id: `LIST-${projectId}` }
+        { type: 'Task', id: `LIST-${projectId}` },
+        'Dashboard'
       ],
     }),
     updateTaskStatus: builder.mutation({
@@ -48,7 +50,8 @@ export const tasksApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id, projectId }) => [
         { type: 'Task', id },
-        { type: 'Task', id: `LIST-${projectId}` }
+        { type: 'Task', id: `LIST-${projectId}` },
+        'Dashboard'
       ],
     }),
     deleteTask: builder.mutation({
@@ -58,7 +61,8 @@ export const tasksApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id, projectId }) => [
         { type: 'Task', id },
-        { type: 'Task', id: `LIST-${projectId}` }
+        { type: 'Task', id: `LIST-${projectId}` },
+        'Dashboard'
       ],
     }),
   }),

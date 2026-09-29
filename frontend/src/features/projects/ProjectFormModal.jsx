@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { projectSchema } from './projectSchemas';
 import { useCreateProjectMutation, useUpdateProjectMutation } from './projectsApi';
 import { FiX } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 
 const ProjectFormModal = ({ onClose, projectToEdit }) => {
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
@@ -28,12 +29,15 @@ const ProjectFormModal = ({ onClose, projectToEdit }) => {
     try {
       if (isEditMode) {
         await updateProject({ id: projectToEdit._id, ...data }).unwrap();
+        toast.success('Project updated successfully!');
       } else {
         await createProject(data).unwrap();
+        toast.success('Project created successfully!');
       }
       onClose();
     } catch (err) {
       console.error('Failed to save project:', err);
+      toast.error(err?.data?.message || 'Failed to save project.');
     }
   };
 
@@ -109,12 +113,15 @@ const ProjectFormModal = ({ onClose, projectToEdit }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-foreground mb-1.5">Due Date (Optional)</label>
+            <label className="block text-sm font-semibold text-foreground mb-1.5">Due Date</label>
             <input 
               {...register('dueDate')}
               type="date" 
               className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring transition-colors"
             />
+            {errors.dueDate && (
+              <p className="mt-1 text-xs text-destructive font-medium">{errors.dueDate.message}</p>
+            )}
           </div>
 
           {/* Actions */}

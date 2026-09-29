@@ -5,5 +5,5 @@ export const projectSchema = z.object({
   description: z.string().optional(),
   status: z.enum(['PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED']).default('PLANNING'),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('MEDIUM'),
-  dueDate: z.string().optional(),
+  dueDate: z.string().date('Please enter a valid due date'),
 });
