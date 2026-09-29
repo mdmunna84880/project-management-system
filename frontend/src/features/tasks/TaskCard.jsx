@@ -1,5 +1,5 @@
-import { FiClock, FiEdit2, FiTrash2, FiUser } from 'react-icons/fi';
-import { useDeleteTaskMutation } from './tasksApi';
+import { FiClock, FiEdit2, FiTrash2, FiUser, FiChevronDown } from 'react-icons/fi';
+import { useDeleteTaskMutation, useUpdateTaskStatusMutation } from './tasksApi';
 import { toast } from 'react-toastify';
 
 const statusColors = {
@@ -17,7 +17,8 @@ const priorityColors = {
 };
 
 const TaskCard = ({ task, onEdit, projectId }) => {
-  const [deleteTask, { isLoading }] = useDeleteTaskMutation();
+  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+  const [updateStatus, { isLoading: isUpdating }] = useUpdateTaskStatusMutation();
   const statusColor = statusColors[task.status] || statusColors.TODO;
   const priorityColor = priorityColors[task.priority] || priorityColors.MEDIUM;
 
@@ -37,13 +38,35 @@ const TaskCard = ({ task, onEdit, projectId }) => {
     }
   };
 
+  const handleStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    try {
+      await updateStatus({ id: task._id, projectId, status: newStatus }).unwrap();
+      // Toast is optional here since UI is optimistic, but good for confirmation
+      toast.success('Task status updated');
+    } catch (err) {
+      toast.error('Failed to update status. Changes reverted.');
+    }
+  };
+
   return (
     <div className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group flex flex-col">
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-2 items-center flex-wrap">
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor}`}>
-            {task.status.replace('_', ' ')}
-          </span>
+          <div className="relative">
+            <select
+              value={task.status}
+              onChange={handleStatusChange}
+              disabled={isUpdating}
+              className={`appearance-none text-[10px] font-bold px-2 py-0.5 pr-5 rounded-full cursor-pointer outline-none ${statusColor} ${isUpdating ? 'opacity-50' : ''}`}
+            >
+              <option value="TODO">TODO</option>
+              <option value="IN_PROGRESS">IN PROGRESS</option>
+              <option value="REVIEW">REVIEW</option>
+              <option value="COMPLETED">COMPLETED</option>
+            </select>
+            <FiChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none opacity-70" />
+          </div>
           {task.isOverdue && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20 shadow-sm animate-pulse">
               OVERDUE
@@ -59,7 +82,7 @@ const TaskCard = ({ task, onEdit, projectId }) => {
           </button>
           <button 
             onClick={handleDelete}
-            disabled={isLoading}
+            disabled={isDeleting}
             className="p-1.5 text-muted-foreground hover:text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
             <FiTrash2 className="text-sm" />

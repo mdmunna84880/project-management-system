@@ -48,6 +48,44 @@ export const tasksApi = api.injectEndpoints({
         method: 'PATCH',
         body: { status },
       }),
+      async onQueryStarted({ id, projectId, status }, { dispatch, queryFulfilled, getState }) {
+        const state = getState();
+        const patchResults = [];
+
+        patchResults.push(
+          dispatch(
+            tasksApi.util.updateQueryData('getTaskById', id, (draft) => {
+              if (draft?.data?.task) {
+                draft.data.task.status = status;
+              }
+            })
+          )
+        );
+
+        const queries = state.api.queries;
+        for (const [key, queryData] of Object.entries(queries)) {
+          if (key.startsWith('getTasks') && queryData?.originalArgs?.projectId === projectId) {
+            patchResults.push(
+              dispatch(
+                tasksApi.util.updateQueryData('getTasks', queryData.originalArgs, (draft) => {
+                  if (draft?.data?.tasks) {
+                    const task = draft.data.tasks.find((t) => t._id === id);
+                    if (task) {
+                      task.status = status;
+                    }
+                  }
+                })
+              )
+            );
+          }
+        }
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResults.forEach((patchResult) => patchResult.undo());
+        }
+      },
       invalidatesTags: (result, error, { id, projectId }) => [
         { type: 'Task', id },
         { type: 'Task', id: `LIST-${projectId}` },
