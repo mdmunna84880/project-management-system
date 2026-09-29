@@ -1,7 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router';
 import { FiHome, FiCheckSquare, FiBell, FiSettings, FiMenu, FiSearch, FiPlus } from 'react-icons/fi';
+import { useGetNotificationsQuery } from '@/features/notifications/notificationsApi';
 
 export default function DashboardLayout() {
+  const { data } = useGetNotificationsQuery(undefined, { pollingInterval: 60000 }); // Poll every minute
+  const unreadCount = data?.data?.unreadCount || 0;
+
   return (
     <div className="flex min-h-screen bg-background text-foreground font-sans selection:bg-accent/30">
       
@@ -18,7 +22,12 @@ export default function DashboardLayout() {
           <nav className="space-y-1">
             <NavItem icon={<FiHome />} label="Dashboard" to="/" />
             <NavItem icon={<FiCheckSquare />} label="Projects" to="/projects" />
-            <NavItem icon={<FiBell />} label="Notifications" to="/notifications" badge="3" />
+            <NavItem 
+              icon={<FiBell />} 
+              label="Notifications" 
+              to="/notifications" 
+              badge={unreadCount > 0 ? unreadCount : null} 
+            />
           </nav>
         </div>
         

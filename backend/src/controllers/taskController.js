@@ -1,8 +1,50 @@
 import Task from '../models/Task.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import Project from '../models/Project.js';
 import { getFilteredTasks } from '../services/taskService.js';
 import notificationService from '../services/notificationService.js';
 
+const notifyUsers = async (task, projectOrId, currentUser, type, message) => {
+    const usersToNotify = new Set();
+    
+    // Determine project owner
+    let ownerId = null;
+    let projectId = null;
+    if (projectOrId && projectOrId.owner) {
+        ownerId = projectOrId.owner.toString();
+        projectId = projectOrId._id;
+    } else {
+        const projectIdToFetch = projectOrId?._id || projectOrId || task.project;
+        const project = await Project.findById(projectIdToFetch).select('owner _id');
+        if (project) {
+            ownerId = project.owner.toString();
+            projectId = project._id;
+        }
+    }
+
+    // Notify project owner if they didn't do the action
+    if (ownerId && ownerId !== currentUser._id.toString()) {
+        usersToNotify.add(ownerId);
+    }
+    
+    // Notify assignee if they didn't do the action
+    if (task.assignedTo) {
+        const assigneeId = task.assignedTo._id ? task.assignedTo._id.toString() : task.assignedTo.toString();
+        if (assigneeId !== currentUser._id.toString()) {
+            usersToNotify.add(assigneeId);
+        }
+    }
+
+    for (const userId of usersToNotify) {
+        await notificationService.createNotification({
+            user: userId,
+            type,
+            message,
+            relatedProject: projectId,
+            relatedTask: task._id,
+        });
+    }
+};
 
 const createTask = async (req, res) => {
     const { title, description, assignedTo, status, priority, dueDate } = req.body;
@@ -18,13 +60,9 @@ const createTask = async (req, res) => {
     });
 
     if (assignedTo) {
-        await notificationService.createNotification({
-            user: assignedTo,
-            type: 'TASK_ASSIGNED',
-            message: `You have been assigned a new task: "${task.title}".`,
-            relatedProject: req.project._id,
-            relatedTask: task._id,
-        });
+        await notifyUsers(task, req.project, req.user, 'TASK_ASSIGNED', `You have been assigned a new task: "${task.title}".`);
+    } else {
+        await notifyUsers(task, req.project, req.user, 'TASK_CREATED', `A new task was created in your project: "${task.title}".`);
     }
 
     res.status(201).json(new ApiResponse(201, { task }, 'Task created successfully'));
@@ -48,14 +86,10 @@ const updateTask = async (req, res) => {
         { new: true, runValidators: true }
     ).populate('assignedTo', 'name email');
 
-    if (req.body.status === 'COMPLETED' && req.task.assignedTo) {
-        await notificationService.createNotification({
-            user: req.task.assignedTo,
-            type: 'TASK_COMPLETED',
-            message: `Task "${req.task.title}" has been marked as completed.`,
-            relatedProject: req.task.project,
-            relatedTask: req.task._id,
-        });
+    if (req.body.status && req.body.status !== req.task.status) {
+        await notifyUsers(updatedTask, req.task.project, req.user, 'TASK_STATUS_CHANGED', `Task "${updatedTask.title}" status changed to ${req.body.status}.`);
+    } else {
+        await notifyUsers(updatedTask, req.task.project, req.user, 'TASK_UPDATED', `Task "${updatedTask.title}" was updated.`);
     }
 
     res.status(200).json(new ApiResponse(200, { task: updatedTask }, 'Task updated successfully'));
@@ -68,14 +102,10 @@ const updateTaskStatus = async (req, res) => {
     req.task.status = status;
     await req.task.save();
 
-    if (status === 'COMPLETED' && req.task.assignedTo) {
-        await notificationService.createNotification({
-            user: req.task.assignedTo,
-            type: 'TASK_COMPLETED',
-            message: `Task "${req.task.title}" has been marked as completed.`,
-            relatedProject: req.task.project,
-            relatedTask: req.task._id,
-        });
+    if (status === 'COMPLETED') {
+        await notifyUsers(req.task, req.task.project, req.user, 'TASK_COMPLETED', `Task "${req.task.title}" has been marked as completed.`);
+    } else {
+        await notifyUsers(req.task, req.task.project, req.user, 'TASK_STATUS_CHANGED', `Task "${req.task.title}" status changed to ${status}.`);
     }
 
     res.status(200).json(new ApiResponse(200, { task: req.task }, 'Task status updated'));
@@ -83,6 +113,7 @@ const updateTaskStatus = async (req, res) => {
 
 const deleteTask = async (req, res) => {
     await Task.findByIdAndDelete(req.task._id);
+    await notifyUsers(req.task, req.task.project, req.user, 'TASK_DELETED', `Task "${req.task.title}" was deleted.`);
     res.status(200).json(new ApiResponse(200, null, 'Task deleted successfully'));
 };
 
