@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router';
-import ProtectedRoute from '@/features/auth/protectedRoute.jsx';
+import ProtectedRoute from '@/features/auth/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 import LoginPage from '@/features/auth/LoginPage.jsx';
 import RegisterPage from '@/features/auth/RegisterPage.jsx';
