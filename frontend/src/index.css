@@ -1,16 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --color-turquoise: hsla(171, 78%, 69%, 1);
-  --color-pearl-aqua: hsla(177, 39%, 61%, 1);
-  --color-dusty-lavender: hsla(271, 12%, 46%, 1);
-  --color-crimson-violet: hsla(335, 57%, 24%, 1);
-  --color-ink-black: hsla(245, 67%, 4%, 1);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
-/* Global Reset & Base Theme */
 @layer base {
+  :root {
+    /* Current Theme: Light Vintage / Maroon */
+    --background: #F5EFE1;
+    --foreground: #790D16;
+
+    --card: #FFFFFF;
+    --card-foreground: #790D16;
+
+    --primary: #790D16;
+    --primary-foreground: #F5EFE1;
+
+    --secondary: #E5D3AF;
+    --secondary-foreground: #790D16;
+
+    --muted: #E5D3AF;
+    --muted-foreground: rgba(121, 13, 22, 0.7);
+
+    --accent: #AEC4D4;
+    --accent-foreground: #790D16;
+    
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #E5D3AF;
+    --input: rgba(245, 239, 225, 0.5);
+    --ring: #AEC4D4;
+  }
+
   body {
-    @apply bg-ink-black text-pearl-aqua antialiased min-h-screen;
+    @apply bg-background text-foreground antialiased min-h-screen;
   }
 }
