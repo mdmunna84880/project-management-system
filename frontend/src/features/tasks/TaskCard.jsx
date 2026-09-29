@@ -40,10 +40,17 @@ const TaskCard = ({ task, onEdit, projectId }) => {
   return (
     <div className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group flex flex-col">
       <div className="flex justify-between items-start mb-3">
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor}`}>
-          {task.status.replace('_', ' ')}
-        </span>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-2 items-center flex-wrap">
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor}`}>
+            {task.status.replace('_', ' ')}
+          </span>
+          {task.isOverdue && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-destructive/10 text-destructive border border-destructive/20 shadow-sm animate-pulse">
+              OVERDUE
+            </span>
+          )}
+        </div>
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           <button 
             onClick={() => onEdit(task)}
             className="p-1.5 text-muted-foreground hover:text-accent rounded-md hover:bg-accent/10 transition-colors"
