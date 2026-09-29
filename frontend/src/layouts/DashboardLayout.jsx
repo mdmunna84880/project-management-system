@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
-import { FiHome, FiCheckSquare, FiBell, FiSettings, FiMenu, FiLogOut, FiPlus, FiUser, FiX, FiList } from 'react-icons/fi';
+import { FiHome, FiCheckSquare, FiBell, FiSettings, FiMenu, FiLogOut, FiPlus, FiUser, FiX, FiList, FiMoon, FiSun } from 'react-icons/fi';
+import { useTheme } from 'next-themes';
 import { useSelector } from 'react-redux';
 import { useGetNotificationsQuery } from '@/features/notifications/notificationsApi';
 import { useLogoutMutation } from '@/features/auth/authApi';
@@ -21,6 +22,7 @@ export default function DashboardLayout() {
   const user = useSelector((state) => state.auth.user);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const { data: notifData } = useGetNotificationsQuery(undefined, { pollingInterval: 60000 });
   const unreadCount = notifData?.data?.unreadCount || 0;
@@ -143,6 +145,15 @@ export default function DashboardLayout() {
             >
               <FiPlus className="text-base" />
               <span className="hidden sm:inline">New Project</span>
+            </button>
+
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 text-muted-foreground hover:bg-secondary rounded-md transition-colors"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
             </button>
 
             {/* Mobile user avatar */}

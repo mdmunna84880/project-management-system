@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '@/lib/api';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/features/auth/authSlice';
+import { useUpdateProfileMutation, useUpdatePasswordMutation } from '@/features/auth/authApi';
 import { FiUser, FiLock, FiSave, FiShield } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -25,8 +25,8 @@ const passwordSchema = z.object({
 const SettingsPage = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+  const [updatePassword, { isLoading: isUpdatingPassword }] = useUpdatePasswordMutation();
 
   const userInitials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
@@ -43,42 +43,25 @@ const SettingsPage = () => {
   });
 
   const onUpdateProfile = async (data) => {
-    setIsUpdatingProfile(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/me/update', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name: data.name }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'Failed to update profile');
+      const result = await updateProfile({ name: data.name }).unwrap();
       dispatch(setCredentials(result.data.user));
       toast.success('Profile updated successfully!');
     } catch (err) {
-      toast.error(err.message || 'Failed to update profile.');
-    } finally {
-      setIsUpdatingProfile(false);
+      toast.error(err?.data?.message || err?.message || 'Failed to update profile.');
     }
   };
 
   const onUpdatePassword = async (data) => {
-    setIsUpdatingPassword(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/me/password', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ currentPassword: data.currentPassword, newPassword: data.newPassword }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || 'Failed to update password');
+      await updatePassword({ 
+        currentPassword: data.currentPassword, 
+        newPassword: data.newPassword 
+      }).unwrap();
       toast.success('Password updated successfully!');
       passwordForm.reset();
     } catch (err) {
-      toast.error(err.message || 'Failed to update password.');
-    } finally {
-      setIsUpdatingPassword(false);
+      toast.error(err?.data?.message || err?.message || 'Failed to update password.');
     }
   };
 

@@ -62,6 +62,38 @@
     --toastify-color-progress-light: var(--primary);
   }
 
+  .dark {
+    /* Dark Theme: Midnight Maroon */
+    --background: #1A1112;
+    --foreground: #F5EFE1;
+
+    --card: #251819;
+    --card-foreground: #F5EFE1;
+
+    --primary: #A32A36;
+    --primary-foreground: #F5EFE1;
+
+    --secondary: #3A2526;
+    --secondary-foreground: #F5EFE1;
+
+    --muted: #3A2526;
+    --muted-foreground: rgba(245, 239, 225, 0.6);
+
+    --accent: #5D7A8C;
+    --accent-foreground: #F5EFE1;
+    
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #3A2526;
+    --input: rgba(37, 24, 25, 0.5);
+    --ring: #5D7A8C;
+
+    --toastify-color-light: var(--card);
+    --toastify-text-color-light: var(--foreground);
+    --toastify-color-progress-light: var(--primary);
+  }
+
   body {
     @apply bg-background text-foreground antialiased min-h-screen;
   }
