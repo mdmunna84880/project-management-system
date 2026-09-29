@@ -1,0 +1,17 @@
+import { z } from 'zod';
+
+const createProjectSchema = z.object({
+    name: z.string().min(2, 'Project name must be at least 2 characters').trim(),
+    description: z.string().optional(),
+    status: z.enum(['PLANNING', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED']).optional(),
+    priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
+    startDate: z.string().datetime().optional(), // Expecting ISO strings
+    dueDate: z.string().datetime({ message: 'Valid due date is required' }),
+});
+
+const updateProjectSchema = createProjectSchema.partial();
+
+export {
+    createProjectSchema,
+    updateProjectSchema,
+};

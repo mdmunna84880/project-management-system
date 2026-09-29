@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { ApiResponse } from './utils/ApiResponse.js';
 import { ApiError } from './utils/AppError.js';
 import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.get('/api/health', (req, res) => {
 
 // Auth Routes
 app.use('/api/auth', authRoutes);
+// Project Routes
+app.use('/api/projects', projectRoutes);
 
 // 404 Handler for undefined routes
 app.use((req, res, next) => {
