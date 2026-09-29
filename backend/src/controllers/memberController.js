@@ -2,6 +2,7 @@ import User from '../models/Users.js';
 import ProjectMember from '../models/ProjectMember.js';
 import { ApiError } from '../utils/AppError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import notificationService from '../services/notificationService.js';
 
 export const getMembers = async (req, res) => {
     // Populate fetches the associated User document so the frontend gets the name and email
@@ -34,6 +35,13 @@ export const addMember = async (req, res) => {
         project: req.project._id,
         user: userToAdd._id,
         role: 'MEMBER',
+    });
+
+    await notificationService.createNotification({
+        user: userToAdd._id,
+        type: 'MEMBER_ADDED',
+        message: `You have been added to the project "${req.project.name}".`,
+        relatedProject: req.project._id,
     });
 
     res.status(201).json(new ApiResponse(201, { membership }, 'Member added successfully'));

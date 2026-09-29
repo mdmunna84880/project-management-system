@@ -1,6 +1,7 @@
 import Task from '../models/Task.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { getFilteredTasks } from '../services/taskService.js';
+import notificationService from '../services/notificationService.js';
 
 
 const createTask = async (req, res) => {
@@ -15,6 +16,16 @@ const createTask = async (req, res) => {
         priority,
         dueDate,
     });
+
+    if (assignedTo) {
+        await notificationService.createNotification({
+            user: assignedTo,
+            type: 'TASK_ASSIGNED',
+            message: `You have been assigned a new task: "${task.title}".`,
+            relatedProject: req.project._id,
+            relatedTask: task._id,
+        });
+    }
 
     res.status(201).json(new ApiResponse(201, { task }, 'Task created successfully'));
 };
@@ -37,6 +48,16 @@ const updateTask = async (req, res) => {
         { new: true, runValidators: true }
     ).populate('assignedTo', 'name email');
 
+    if (req.body.status === 'COMPLETED' && req.task.assignedTo) {
+        await notificationService.createNotification({
+            user: req.task.assignedTo,
+            type: 'TASK_COMPLETED',
+            message: `Task "${req.task.title}" has been marked as completed.`,
+            relatedProject: req.task.project,
+            relatedTask: req.task._id,
+        });
+    }
+
     res.status(200).json(new ApiResponse(200, { task: updatedTask }, 'Task updated successfully'));
 };
 
@@ -46,6 +67,16 @@ const updateTaskStatus = async (req, res) => {
 
     req.task.status = status;
     await req.task.save();
+
+    if (status === 'COMPLETED' && req.task.assignedTo) {
+        await notificationService.createNotification({
+            user: req.task.assignedTo,
+            type: 'TASK_COMPLETED',
+            message: `Task "${req.task.title}" has been marked as completed.`,
+            relatedProject: req.task.project,
+            relatedTask: req.task._id,
+        });
+    }
 
     res.status(200).json(new ApiResponse(200, { task: req.task }, 'Task status updated'));
 };
