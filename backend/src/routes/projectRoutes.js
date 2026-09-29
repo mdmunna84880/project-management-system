@@ -7,10 +7,12 @@ import {
     archiveProject,
     deleteProject,
 } from '../controllers/projectController.js';
-import {validate} from '../middleware/validate.js';
+import { validate } from '../middleware/validate.js';
 import { createProjectSchema, updateProjectSchema } from '../validators/projectValidator.js';
 import authenticate from '../middleware/authenticate.js';
 import requireProjectAccess from '../middleware/requireProjectAccess.js';
+import { getMembers, addMember, removeMember } from '../controllers/memberController.js';
+import { addMemberSchema } from '../validators/memberValidator.js';
 
 const router = Router();
 
@@ -25,5 +27,10 @@ router.get('/:id', requireProjectAccess('MEMBER'), getProjectById);
 router.patch('/:id', requireProjectAccess('OWNER'), validate(updateProjectSchema), updateProject);
 router.patch('/:id/archive', requireProjectAccess('OWNER'), archiveProject);
 router.delete('/:id', requireProjectAccess('OWNER'), deleteProject);
+
+// Member management routes
+router.get('/:id/members', requireProjectAccess('MEMBER'), getMembers);
+router.post('/:id/members', requireProjectAccess('OWNER'), validate(addMemberSchema), addMember);
+router.delete('/:id/members/:userId', requireProjectAccess('OWNER'), removeMember);
 
 export default router;
