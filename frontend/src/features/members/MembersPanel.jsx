@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 const MembersPanel = ({ projectId, projectOwnerId }) => {
-  const { data: response, isLoading } = useGetMembersQuery(projectId);
+  const { data: response, isLoading, isError } = useGetMembersQuery(projectId);
   const [addMember, { isLoading: isAdding }] = useAddMemberMutation();
   const [removeMember, { isLoading: isRemoving }] = useRemoveMemberMutation();
   const currentUser = useSelector((state) => state.auth.user);
@@ -48,8 +48,19 @@ const MembersPanel = ({ projectId, projectOwnerId }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary"></div>
+      <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex flex-col justify-center items-center gap-3 py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary" />
+        <p className="text-sm text-muted-foreground">Loading members…</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-5 shadow-sm text-center py-12">
+        <FiUserMinus className="text-3xl text-muted-foreground/30 mx-auto mb-3" />
+        <p className="text-sm font-semibold text-foreground">Unable to load members.</p>
+        <p className="text-xs text-muted-foreground mt-1">Please try again later.</p>
       </div>
     );
   }

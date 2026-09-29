@@ -14,7 +14,7 @@ const notificationIcons = {
 };
 
 const NotificationsPage = () => {
-  const { data, isLoading } = useGetNotificationsQuery(undefined, { pollingInterval: 60000 });
+  const { data, isLoading, isError } = useGetNotificationsQuery(undefined, { pollingInterval: 60000 });
   const [markAsRead, { isLoading: isMarking }] = useMarkAsReadMutation();
   const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
 
@@ -40,8 +40,18 @@ const NotificationsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary"></div>
+      <div className="h-full flex flex-col items-center justify-center gap-3">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary" />
+        <p className="text-sm text-muted-foreground font-medium">Loading notifications…</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center gap-3 text-center">
+        <FiBell className="text-5xl text-muted-foreground/30" />
+        <p className="font-semibold text-foreground">Unable to load notifications. Please try again.</p>
       </div>
     );
   }

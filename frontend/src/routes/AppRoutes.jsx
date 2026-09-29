@@ -8,6 +8,7 @@ import NotificationsPage from '@/features/notifications/NotificationsPage.jsx';
 import ProjectList from '@/features/projects/ProjectList.jsx';
 import ProjectDetails from '@/features/projects/ProjectDetails.jsx';
 import MyTasksPage from '@/features/tasks/MyTasksPage.jsx';
+import SettingsPage from '@/features/auth/SettingsPage.jsx';
 import { FiCheckSquare } from 'react-icons/fi';
 
 const DashboardPlaceholder = () => (
@@ -32,7 +33,7 @@ const AppRoutes = () => {
           <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/tasks" element={<MyTasksPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/settings" element={<DashboardPlaceholder />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 

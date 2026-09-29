@@ -44,16 +44,21 @@ const TaskList = ({ projectId }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-card border border-border rounded-xl p-5 shadow-sm h-64 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary"></div>
+      <div className="bg-card border border-border rounded-xl p-5 shadow-sm h-64 flex flex-col justify-center items-center gap-3">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary" />
+        <p className="text-sm text-muted-foreground font-medium">Loading tasks…</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-destructive/10 text-destructive p-4 rounded-md text-sm font-medium border border-destructive/20">
-        Error loading tasks. You might not have permission.
+      <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex flex-col items-center justify-center gap-3 text-center">
+        <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+          <FiPlus className="text-destructive text-xl rotate-45" />
+        </div>
+        <p className="font-semibold text-foreground">Unable to load tasks. Please try again.</p>
+        <p className="text-sm text-muted-foreground">Check your connection or permissions.</p>
       </div>
     );
   }
@@ -84,7 +89,7 @@ const TaskList = ({ projectId }) => {
             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mb-3">
               <FiPlus className="text-xl" />
             </div>
-            <p className="font-semibold text-foreground">No tasks yet</p>
+            <p className="font-semibold text-foreground">No tasks found.</p>
             <p className="text-sm mt-1 max-w-[250px]">Create a task to start tracking work for this project.</p>
           </div>
         ) : (

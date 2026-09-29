@@ -80,3 +80,31 @@ export const getMe = async (req, res) => {
         new ApiResponse(200, { user: req.user }, 'Current user fetched successfully')
     );
 };
+
+export const updateProfile = async (req, res) => {
+    const { name } = req.body;
+    if (!name || name.trim().length < 2) {
+        throw new ApiError(400, 'Name must be at least 2 characters');
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { name: name.trim() },
+        { new: true, runValidators: true }
+    );
+    res.status(200).json(new ApiResponse(200, { user }, 'Profile updated successfully'));
+};
+
+export const updatePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword || newPassword.length < 6) {
+        throw new ApiError(400, 'Current password and a new password of at least 6 characters are required');
+    }
+    const user = await User.findById(req.user._id).select('+password');
+    const isMatch = await user.isPasswordCorrect(currentPassword);
+    if (!isMatch) {
+        throw new ApiError(401, 'Current password is incorrect');
+    }
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json(new ApiResponse(200, null, 'Password updated successfully'));
+};

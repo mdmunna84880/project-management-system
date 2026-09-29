@@ -1,5 +1,5 @@
 import { useGetDashboardStatsQuery } from './dashboardApi';
-import { FiActivity, FiCheckCircle, FiClock, FiAlertCircle, FiFolder } from 'react-icons/fi';
+import { FiActivity, FiCheckCircle, FiClock, FiAlertCircle, FiFolder, FiRefreshCw } from 'react-icons/fi';
 
 const StatCard = ({ icon, label, value, colorClass }) => (
   <div className="bg-card border border-border p-5 rounded-xl shadow-sm flex items-center gap-4">
@@ -14,12 +14,31 @@ const StatCard = ({ icon, label, value, colorClass }) => (
 );
 
 const DashboardPage = () => {
-  const { data: response, isLoading } = useGetDashboardStatsQuery();
+  const { data: response, isLoading, isError, refetch } = useGetDashboardStatsQuery();
   
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary"></div>
+      <div className="h-full flex flex-col items-center justify-center gap-3">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary/30 border-t-primary" />
+        <p className="text-sm text-muted-foreground font-medium">Loading dashboard…</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
+        <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
+          <FiAlertCircle className="text-destructive text-2xl" />
+        </div>
+        <p className="font-semibold text-foreground text-lg">Unable to load dashboard</p>
+        <p className="text-sm text-muted-foreground">The server may be down or you may have lost your connection.</p>
+        <button
+          onClick={refetch}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-bold hover:bg-primary/90 transition-colors"
+        >
+          <FiRefreshCw /> Try again
+        </button>
       </div>
     );
   }
