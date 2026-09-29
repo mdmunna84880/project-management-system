@@ -3,6 +3,8 @@ import ProtectedRoute from '@/features/auth/protectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 import LoginPage from '@/features/auth/LoginPage.jsx';
 import RegisterPage from '@/features/auth/RegisterPage.jsx';
+import ProjectList from '@/features/projects/ProjectList.jsx';
+import ProjectDetails from '@/features/projects/ProjectDetails.jsx';
 import { FiCheckSquare } from 'react-icons/fi';
 
 const DashboardPlaceholder = () => (
@@ -22,7 +24,8 @@ const AppRoutes = () => {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/" element={<DashboardPlaceholder />} />
+          <Route path="/" element={<ProjectList />} />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/tasks" element={<DashboardPlaceholder />} />
           <Route path="/notifications" element={<DashboardPlaceholder />} />
           <Route path="/settings" element={<DashboardPlaceholder />} />
