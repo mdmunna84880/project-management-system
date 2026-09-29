@@ -5,14 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { addMemberSchema } from './memberSchemas';
 import { FiUserPlus, FiUserMinus, FiShield } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const MembersPanel = ({ projectId, projectOwnerId }) => {
   const { data: response, isLoading } = useGetMembersQuery(projectId);
   const [addMember, { isLoading: isAdding }] = useAddMemberMutation();
   const [removeMember, { isLoading: isRemoving }] = useRemoveMemberMutation();
   const currentUser = useSelector((state) => state.auth.user);
-  
-  const [addError, setAddError] = useState('');
 
   const members = response?.data?.members || [];
   
@@ -27,11 +26,11 @@ const MembersPanel = ({ projectId, projectOwnerId }) => {
 
   const onAddMember = async (data) => {
     try {
-      setAddError('');
       await addMember({ projectId, email: data.email }).unwrap();
+      toast.success('Member added successfully!');
       reset();
     } catch (err) {
-      setAddError(err?.data?.message || 'Failed to add member.');
+      toast.error(err?.data?.message || 'Failed to add member.');
     }
   };
 
@@ -39,9 +38,10 @@ const MembersPanel = ({ projectId, projectOwnerId }) => {
     if (window.confirm('Are you sure you want to remove this member?')) {
       try {
         await removeMember({ projectId, userId }).unwrap();
+        toast.success('Member removed successfully!');
       } catch (err) {
         console.error('Failed to remove member:', err);
-        alert(err?.data?.message || 'Failed to remove member.');
+        toast.error(err?.data?.message || 'Failed to remove member.');
       }
     }
   };
@@ -83,7 +83,6 @@ const MembersPanel = ({ projectId, projectOwnerId }) => {
             </button>
           </div>
           {errors.email && <p className="text-xs text-destructive mt-1 font-medium">{errors.email.message}</p>}
-          {addError && <p className="text-xs text-destructive mt-1 font-medium">{addError}</p>}
         </form>
       )}
 

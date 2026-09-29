@@ -1,0 +1,74 @@
+import { api } from '@/lib/api';
+
+export const tasksApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getTasks: builder.query({
+      query: ({ projectId, ...filters }) => ({
+        url: `/projects/${projectId}/tasks`,
+        params: filters, 
+      }),
+      providesTags: (result, error, { projectId }) => 
+        result?.data?.tasks
+          ? [
+              ...result.data.tasks.map(({ _id }) => ({ type: 'Task', id: _id })),
+              { type: 'Task', id: `LIST-${projectId}` },
+            ]
+          : [{ type: 'Task', id: `LIST-${projectId}` }],
+    }),
+    getTaskById: builder.query({
+      query: (id) => `/tasks/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Task', id }],
+    }),
+    createTask: builder.mutation({
+      query: ({ projectId, ...taskData }) => ({
+        url: `/projects/${projectId}/tasks`,
+        method: 'POST',
+        body: taskData,
+      }),
+      invalidatesTags: (result, error, { projectId }) => [
+        { type: 'Task', id: `LIST-${projectId}` },
+      ],
+    }),
+    updateTask: builder.mutation({
+      query: ({ id, projectId, ...patch }) => ({
+        url: `/tasks/${id}`,
+        method: 'PATCH',
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { id, projectId }) => [
+        { type: 'Task', id },
+        { type: 'Task', id: `LIST-${projectId}` }
+      ],
+    }),
+    updateTaskStatus: builder.mutation({
+      query: ({ id, projectId, status }) => ({
+        url: `/tasks/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: (result, error, { id, projectId }) => [
+        { type: 'Task', id },
+        { type: 'Task', id: `LIST-${projectId}` }
+      ],
+    }),
+    deleteTask: builder.mutation({
+      query: ({ id, projectId }) => ({
+        url: `/tasks/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { id, projectId }) => [
+        { type: 'Task', id },
+        { type: 'Task', id: `LIST-${projectId}` }
+      ],
+    }),
+  }),
+});
+
+export const {
+  useGetTasksQuery,
+  useGetTaskByIdQuery,
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  useUpdateTaskStatusMutation,
+  useDeleteTaskMutation,
+} = tasksApi;

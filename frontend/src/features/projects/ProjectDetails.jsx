@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router';
 import { useGetProjectByIdQuery } from './projectsApi';
 import MembersPanel from '../members/MembersPanel';
+import TaskList from '../tasks/TaskList';
 import { FiArrowLeft, FiClock, FiCheckSquare } from 'react-icons/fi';
 
 const statusColors = {
@@ -66,12 +67,8 @@ const ProjectDetails = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 space-y-6">
-          <div className="bg-card border border-border rounded-xl p-5 shadow-sm min-h-[300px] flex flex-col items-center justify-center text-muted-foreground">
-            <FiCheckSquare className="text-4xl mb-3 opacity-50" />
-            <h3 className="text-lg font-bold text-foreground mb-1">Tasks</h3>
-            <p className="font-medium text-sm text-center">Task Management (Coming Soon - Phase 4)</p>
-          </div>
+        <div className="xl:col-span-2 flex flex-col h-full min-h-[500px]">
+          <TaskList projectId={project._id} />
         </div>
         <div className="xl:col-span-1">
           <MembersPanel projectId={project._id} projectOwnerId={project.owner} />

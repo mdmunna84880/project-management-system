@@ -54,6 +54,12 @@
     --border: #E5D3AF;
     --input: rgba(245, 239, 225, 0.5);
     --ring: #AEC4D4;
+
+    /* React Toastify overrides to match theme */
+    --toastify-color-light: var(--card);
+    --toastify-text-color-light: var(--foreground);
+    --toastify-font-family: inherit;
+    --toastify-color-progress-light: var(--primary);
   }
 
   body {
