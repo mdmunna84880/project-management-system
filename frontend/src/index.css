@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-turquoise: hsla(171, 78%, 69%, 1);
+  --color-pearl-aqua: hsla(177, 39%, 61%, 1);
+  --color-dusty-lavender: hsla(271, 12%, 46%, 1);
+  --color-crimson-violet: hsla(335, 57%, 24%, 1);
+  --color-ink-black: hsla(245, 67%, 4%, 1);
+}
+
+/* Global Reset & Base Theme */
+@layer base {
+  body {
+    @apply bg-ink-black text-pearl-aqua antialiased min-h-screen;
+  }
+}
