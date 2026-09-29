@@ -1,6 +1,6 @@
 import Task from '../models/Task.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-
+import { getFilteredTasks } from '../services/taskService.js';
 
 
 const createTask = async (req, res) => {
@@ -20,11 +20,9 @@ const createTask = async (req, res) => {
 };
 
 const getTasks = async (req, res) => {
-    const tasks = await Task.find({ project: req.project._id })
-        .populate('assignedTo', 'name email')
-        .sort({ createdAt: -1 });
+    const result = await getFilteredTasks(req.project._id, req.query);
 
-    res.status(200).json(new ApiResponse(200, { tasks }, 'Tasks fetched successfully'));
+    res.status(200).json(new ApiResponse(200, { tasks: result.tasks, pagination: result.pagination }, 'Tasks fetched successfully'));
 };
 
 const getTaskById = async (req, res) => {
