@@ -8,6 +8,7 @@ import { ApiResponse } from './utils/ApiResponse.js';
 import { ApiError } from './utils/AppError.js';
 import authRoutes from './routes/authRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 
 const app = express();
 
@@ -33,6 +34,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 // Project Routes
 app.use('/api/projects', projectRoutes);
+// Task Routes
+app.use('/api/tasks', taskRoutes);
 
 // 404 Handler for undefined routes
 app.use((req, res, next) => {
