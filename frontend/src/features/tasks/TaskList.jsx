@@ -1,15 +1,36 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 import { useGetTasksQuery } from './tasksApi';
 import TaskCard from './TaskCard';
 import TaskFormModal from './TaskFormModal';
+import TaskFilters from './TaskFilters';
+import Pagination from './Pagination';
 import { FiPlus } from 'react-icons/fi';
 
 const TaskList = ({ projectId }) => {
-  const { data: response, isLoading, error } = useGetTasksQuery({ projectId });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Convert searchParams to an object to pass to RTK Query
+  const queryParams = useMemo(() => {
+    const params = { projectId };
+    for (const [key, value] of searchParams.entries()) {
+      if (value) params[key] = value;
+    }
+    return params;
+  }, [searchParams, projectId]);
+
+  const { data: response, isLoading, error, isFetching } = useGetTasksQuery(queryParams);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
   const tasks = response?.data?.tasks || [];
+  const pagination = response?.data?.pagination;
+
+  const handlePageChange = (newPage) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', newPage.toString());
+    setSearchParams(newParams);
+  };
 
   const handleOpenCreateModal = () => {
     setTaskToEdit(null);
@@ -39,20 +60,25 @@ const TaskList = ({ projectId }) => {
 
   return (
     <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-bold text-foreground">Tasks</h3>
-          <p className="text-xs text-muted-foreground font-medium">{tasks.length} total task(s)</p>
+      <div className="px-5 py-4 border-b border-border flex flex-col">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-foreground">Tasks</h3>
+            <p className="text-xs text-muted-foreground font-medium">
+              {pagination ? `${pagination.totalRecords} total task(s)` : `${tasks.length} total task(s)`}
+            </p>
+          </div>
+          <button 
+            onClick={handleOpenCreateModal}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+          >
+            <FiPlus /> New Task
+          </button>
         </div>
-        <button 
-          onClick={handleOpenCreateModal}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-1.5 shadow-sm"
-        >
-          <FiPlus /> New Task
-        </button>
+        <TaskFilters projectId={projectId} />
       </div>
 
-      <div className="p-5 flex-grow overflow-y-auto custom-scrollbar">
+      <div className={`p-5 flex-grow overflow-y-auto custom-scrollbar transition-opacity duration-200 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
         {tasks.length === 0 ? (
           <div className="h-full min-h-[200px] flex flex-col items-center justify-center text-muted-foreground text-center">
             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mb-3">
@@ -72,6 +98,14 @@ const TaskList = ({ projectId }) => {
               />
             ))}
           </div>
+        )}
+        
+        {pagination && (
+          <Pagination 
+            currentPage={pagination.currentPage} 
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+          />
         )}
       </div>
 
